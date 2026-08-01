@@ -1,0 +1,98 @@
+{
+  "name": "My workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "ef0f0aa6-0036-46ed-9603-a3f601a1c0d5",
+        "options": {}
+      },
+      "id": "3f13aa93-2520-4a39-b906-243e10ec722d",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ],
+      "webhookId": "ef0f0aa6-0036-46ed-9603-a3f601a1c0d5"
+    },
+    {
+      "parameters": {
+        "jsCode": "// O n8n recebe o JSON do fórum dentro de $json.body\nconst body = $json.body || $json;\n\nconst email = body.email || '';\nconst username = body.username || 'Usuario_Anonimo';\n\n// Regra do domínio do desafio\nconst isEmpresaDomain = email.toLowerCase().endsWith('@empresa.com');\n\n// Define a mensagem\nlet welcomeMessage = '';\nif (isEmpresaDomain) {\n  welcomeMessage = `Bem-vindo(a) ao time, @${username}!`;\n} else {\n  welcomeMessage = `Seja muito bem-vindo(a) à nossa comunidade, @${username}!`;\n}\n\n// Retorna o objeto na raiz para o nó do Monday ler sem dar 'undefined'\nreturn {\n  username: username,\n  email: email,\n  welcome_message: welcomeMessage\n};"
+      },
+      "id": "dabb30eb-f1d3-4055-9a9a-6c4bbc812155",
+      "name": "Code in JavaScript",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        224,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "boardItem",
+        "boardId": "18424601013",
+        "groupId": "topics",
+        "name": "={{ $json.username }}",
+        "additionalFields": {
+          "columnValues": "={{ JSON.stringify({ \"email\": { \"email\": $json.email, \"text\": $json.email }, \"text\": $json.welcome_message }) }}"
+        }
+      },
+      "id": "0815898f-883b-4d15-9bea-9d300274e2d4",
+      "name": "Create an item in a board's group",
+      "type": "n8n-nodes-base.mondayCom",
+      "typeVersion": 1,
+      "position": [
+        448,
+        0
+      ],
+      "credentials": {
+        "mondayComApi": {
+          "id": "HtUHWBGE93AXzoWv",
+          "name": "Monday.com account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Create an item in a board's group",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "bf69c6dc-56f4-440e-99e1-a6bcb5d767f7",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "28d48953f9b9cab2a6e39ef4e78c7a22de30af94a4447e5d9bc17c7666b95854"
+  },
+  "nodeGroups": [],
+  "id": "NZG0gWTgcehBwNwR",
+  "tags": []
+}
